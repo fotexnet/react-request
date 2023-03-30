@@ -1,7 +1,11 @@
 import { useMemo, useState } from 'react';
 import QueryBuilder from '../../utils/QueryBuilder/QueryBuilder';
 
-const useQueryBuilder = (): UseQueryBuilder => {
+/**
+ * Returns an instance of the `QueryBuilder` class
+ * @returns the `query` and the `params` object as well as every method of the `QueryBuilder` class
+ */
+function useQueryBuilder(): UseQueryBuilder {
   const [query, setQuery] = useState<string>('');
   const qb = useMemo(() => new QueryBuilder({ dispatch: setQuery }), []);
 
@@ -17,7 +21,7 @@ const useQueryBuilder = (): UseQueryBuilder => {
     removeFilter: qb.removeFilter.bind(qb),
     has: qb.has.bind(qb),
   };
-};
+}
 
 export default useQueryBuilder;
 

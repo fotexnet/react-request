@@ -14,6 +14,12 @@ export default class QueryBuilder {
     return Object.freeze({ ...this._params });
   }
 
+  /**
+   * Pushes a new key-value pair to the `filter` object
+   * @param key
+   * @param value
+   * @returns the current `QueryBuilder` instance
+   */
   public where(key: string, value: WhereInputType): this {
     const filtersObj = this._params.filter || {};
     const context = filtersObj[key] || [];
@@ -22,17 +28,34 @@ export default class QueryBuilder {
     return this;
   }
 
+  /**
+   * Pushes a new key-value pair to the `sort` object
+   * @param key
+   * @param value
+   * @returns the current `QueryBuilder` instance
+   */
   public sort(value: string, order: 'asc' | 'desc'): this {
     const newValue = order === 'asc' ? value : `-${value}`;
     this._params = { ...this._params, sort: [...(this._params.sort || []), newValue] };
     return this;
   }
 
+  /**
+   * Pushes a new key-value pair to the `include` object
+   * @param key
+   * @param value
+   * @returns the current `QueryBuilder` instance
+   */
   public include(value: string): this {
     this._params = { ...this._params, include: [...(this._params.include || []), value] };
     return this;
   }
 
+  /**
+   * Transforms the `params` object to a string. This method is essential for the query!
+   * @param config `qs` library configuration object merged with the `UrlConfig` type
+   * @returns the query string with a leading '?'
+   */
   public url({ shouldUpdateState = true, ...config }: qs.IStringifyOptions & UrlConfig = {}): string {
     const { filter, sort, include } = this._params;
     const queryParams = [
@@ -56,6 +79,10 @@ export default class QueryBuilder {
     return query;
   }
 
+  /**
+   * Destroys a subset of the `params` object based on the given key. If you do NOT provide a key, this will clear every entry!
+   * @param filterType a key of the `params` object
+   */
   public destroy(filterType?: keyof ParamsType): void {
     if (!filterType) {
       this._params = {};
@@ -67,6 +94,11 @@ export default class QueryBuilder {
     }, {});
   }
 
+  /**
+   * Checks wheter or not the `params` object contains a given key or value
+   * @param config
+   * @returns `true` or `false`
+   */
   public has(config: HasConfig): boolean {
     switch (config.type) {
       case 'filter':
@@ -76,6 +108,11 @@ export default class QueryBuilder {
     }
   }
 
+  /**
+   * Removes a subset of the `params` object
+   * @param config
+   * @returns the current `QueryBuilder` instance
+   */
   public remove(config: RemoveConfig): this {
     switch (config.type) {
       case 'filter':
@@ -92,6 +129,11 @@ export default class QueryBuilder {
     }
   }
 
+  /**
+   * Removes a subset of the `params` object based on the key
+   * @param key
+   * @returns the current `QueryBuilder` instance
+   */
   public removeFilter(key: string): this {
     if (!this._params.filter || !this._params.filter[key]) return this;
 
