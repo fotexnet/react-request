@@ -19,6 +19,7 @@
     "npm": "use Yarn!"
   },
   "scripts": {
+    "commit": "git-cz",
     "start": "tsdx watch",
     "build": "tsdx build",
     "test": "tsdx test",
@@ -56,7 +57,9 @@
     "@typescript-eslint/eslint-plugin": "^5.44.0",
     "@typescript-eslint/parser": "^5.44.0",
     "autoprefixer": "^10.4.14",
+    "commitizen": "^4.3.0",
     "cssnano": "^6.0.0",
+    "cz-conventional-changelog": "^3.3.0",
     "eslint": "^8.28.0",
     "eslint-config-prettier": "^8.5.0",
     "eslint-import-resolver-typescript": "^3.5.2",
@@ -72,5 +75,10 @@
     "tsdx": "^0.14.1",
     "tslib": "^2.5.0",
     "typescript": "^4.9.5"
+  },
+  "config": {
+    "commitizen": {
+      "path": "./node_modules/cz-conventional-changelog"
+    }
   }
 }
