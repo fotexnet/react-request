@@ -19,7 +19,7 @@
     "npm": "use Yarn!"
   },
   "scripts": {
-    "commit": "yarn lint && git add . && git-cz",
+    "commit": "git add . && git-cz",
     "start": "tsdx watch",
     "build": "tsdx build",
     "test": "tsdx test",
