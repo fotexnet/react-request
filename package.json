@@ -1,5 +1,5 @@
 {
-  "version": "0.1.0",
+  "version": "0.0.0-development",
   "name": "@fotexnet/react-request",
   "author": "Nagy Viktor",
   "license": "MIT",
@@ -11,6 +11,7 @@
   ],
   "homepage": "https://github.com/fotexnet/react-request#README.md",
   "repository": {
+    "type": "git",
     "url": "https://github.com/fotexnet/react-request.git"
   },
   "publishConfig": {},
@@ -25,7 +26,8 @@
     "lint": "eslint src",
     "prepare": "husky install && tsdx build",
     "size": "size-limit",
-    "analyze": "size-limit --why"
+    "analyze": "size-limit --why",
+    "semantic-release": "semantic-release --branches main"
   },
   "module": "dist/react-request.esm.js",
   "size-limit": [
@@ -70,6 +72,7 @@
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "rollup-plugin-postcss": "^4.0.2",
+    "semantic-release": "^21.0.1",
     "size-limit": "^8.2.4",
     "tsdx": "^0.14.1",
     "tslib": "^2.5.0",
