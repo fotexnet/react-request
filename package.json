@@ -1,6 +1,6 @@
 {
   "version": "0.1.0",
-  "name": "react-request",
+  "name": "@fotexnet/react-request",
   "author": "Nagy Viktor",
   "license": "MIT",
   "main": "dist/index.js",
@@ -9,6 +9,11 @@
     "dist",
     "src"
   ],
+  "homepage": "https://github.com/fotexnet/react-request#README.md",
+  "repository": {
+    "url": "https://github.com/fotexnet/react-request.git"
+  },
+  "publishConfig": {},
   "engines": {
     "node": ">=10",
     "npm": "use Yarn!"
