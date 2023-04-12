@@ -44,7 +44,7 @@ This hook is created from the utility class `QueryBuilder` which creates and man
 | method    | signature                                               | chainable | repeated keys | description                                                                                          |
 | --------- | ------------------------------------------------------- | --------- | ------------- | ---------------------------------------------------------------------------------------------------- |
 | `where`   | `(key: string, value: WhereInputValue) => QueryBuilder` | Yes       | Yes           | Pushes a new key-value pair to the `filter` object and returns the current `QueryBuilder` instance.  |
-| `sort`    | `(key: string, order: 'asc' | 'desc') => QueryBuilder`  | Yes       | No            | Pushes a new key-value pair to the `sort` object and returns the current `QueryBuilder` instance.    |
+| `sort`    | `(key: string, order: 'asc', 'desc') => QueryBuilder`   | Yes       | No            | Pushes a new key-value pair to the `sort` object and returns the current `QueryBuilder` instance.    |
 | `include` | `(key: string) => QueryBuilder`                         | Yes       | No            | Pushes a new key-value pair to the `include` object and returns the current `QueryBuilder` instance. |
 | `url`     | `(config: qs.IStringifyOptions & UrlConfig) => string`  | No        | -             | Creates a query string. If you do NOT call this method, you will NOT get a query string at all!      |
 
@@ -61,7 +61,7 @@ This hook is created from the utility class `QueryBuilder` which creates and man
 
 **WhereInputValue**
 
-Possible values are `'string' | 'number' | 'boolean' | 'null'`
+Possible values are `'string', 'number', 'boolean', 'null'`
 
 **ParamsType**
 
@@ -79,19 +79,19 @@ Possible values are `'string' | 'number' | 'boolean' | 'null'`
 
 **HasConfig**
 
-| property | type                                    | default | description                                                                                            |
-| -------- | --------------------------------------- | ------- | ------------------------------------------------------------------------------------------------------ |
-| `type`   | `'key' | 'filter' | 'sort' | 'include'` | -       | key in the container object (`'key'` is a special type that searches in the `filter` object for a key) |
-| `value`  | `string | WhereInputType`               | -       | value to find                                                                                          |
-| `key`    | `string`                                | -       | key in the `filter` object (only accessible if `type` set to `filter`)                                 |
+| property | type                                 | default | description                                                                                            |
+| -------- | ------------------------------------ | ------- | ------------------------------------------------------------------------------------------------------ |
+| `type`   | `'key', 'filter', 'sort', 'include'` | -       | key in the container object (`'key'` is a special type that searches in the `filter` object for a key) |
+| `value`  | `string | WhereInputType`            | -       | value to find                                                                                          |
+| `key`    | `string`                             | -       | key in the `filter` object (only accessible if `type` set to `filter`)                                 |
 
 **RemoveConfig**
 
-| property | type                            | default | description                                                            |
-| -------- | ------------------------------- | ------- | ---------------------------------------------------------------------- |
-| `type`   | `'filter' | 'sort' | 'include'` | -       | key in the container object                                            |
-| `value`  | `string`                        | -       | value to remove                                                        |
-| `key`    | `string`                        | -       | key in the `filter` object (only accessible if `type` set to `filter`) |
+| property | type                          | default | description                                                            |
+| -------- | ----------------------------- | ------- | ---------------------------------------------------------------------- |
+| `type`   | `'filter', 'sort', 'include'` | -       | key in the container object                                            |
+| `value`  | `string`                      | -       | value to remove                                                        |
+| `key`    | `string`                      | -       | key in the `filter` object (only accessible if `type` set to `filter`) |
 
 ### useQueryFunction
 
@@ -110,7 +110,7 @@ Creates a mutation function for `react-query` package. Returns an object contain
 
 | argument  | type                                                            | required | description                                          |
 | --------- | --------------------------------------------------------------- | -------- | ---------------------------------------------------- |
-| `method`  | `'POST' | 'PUT' | 'DELETE'`                                     | Yes      | mutation method                                      |
+| `method`  | `'POST', 'PUT', 'DELETE'`                                       | Yes      | mutation method                                      |
 | `factory` | `(variables: TVariables) => Omit<AxiosRequestConfig, 'method'>` | Yes      | consumes the variables to create a mutation function |
 
 ## Higher-order components
