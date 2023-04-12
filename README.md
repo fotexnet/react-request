@@ -95,14 +95,23 @@ Possible values are `'string' | 'number' | 'boolean' | 'null'`
 
 ### useQueryFunction
 
-Creates a query function for the `react-query` package. Takes two arguments, `config` and `callback`.
+Creates a query function for the `react-query` package. Takes two arguments, `config` and `callback`. Returns a function.
 
-| argument   | required | description                                                                                                              |
-| ---------- | -------- | ------------------------------------------------------------------------------------------------------------------------ |
-| `config`   | Yes      | uses generic type created from `AxiosRequestConfig` to tell `react-query` what type of data to expect from the function. |
-| `callback` | No       | consumes the context of the `useQuery` hook and returns a new `config`                                                   |
+| argument   | type                                                            | required | description                                                            |
+| ---------- | --------------------------------------------------------------- | -------- | ---------------------------------------------------------------------- |
+| `config`   | `UseQueryFunctionConfig<TData>`                                 | Yes      | initial config                                                         |
+| `callback` | `(context: TContext) => Partial<UseQueryFunctionConfig<TData>>` | No       | consumes the context of the `useQuery` hook and returns a new `config` |
+
+**UseQueryFunctionConfig**: `Omit<AxiosRequestConfig<TData>, 'signal'>`
 
 ### useMutationFunction
+
+Creates a mutation function for `react-query` package. Returns an object containing two functions: `mutation` and `invalidate`.
+
+| argument  | type                                                            | required | description                                          |
+| --------- | --------------------------------------------------------------- | -------- | ---------------------------------------------------- |
+| `method`  | `'POST' | 'PUT' | 'DELETE'`                                     | Yes      | mutation method                                      |
+| `factory` | `(variables: TVariables) => Omit<AxiosRequestConfig, 'method'>` | Yes      | consumes the variables to create a mutation function |
 
 ## Higher-order components
 
