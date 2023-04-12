@@ -33,6 +33,16 @@
 
 ### Spinner
 
+The `withLoading` higher-order component uses this as the loading indicator component.
+
+**SpinnerProps**
+
+| property      | type     | required | default     | description                                   |
+| ------------- | -------- | -------- | ----------- | --------------------------------------------- |
+| `color`       | `string` | No       | `steelblue` | sets the color of the spinner stripes         |
+| `width`       | `number` | No       | `300`       | dimensions of the spinner container in pixels |
+| `stripeWidth` | `number` | No       | `15`        | width of spinner stripes in pixels            |
+
 ## Hooks
 
 ### useQueryBuilder
