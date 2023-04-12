@@ -4,17 +4,12 @@
   - [Components](#components)
     - [Spinner](#spinner)
   - [Hooks](#hooks)
-    - [QueryBuilder](#querybuilder)
-      - [`where(key: string, value: WhereInputValue) => QueryBuilder`](#wherekey-string-value-whereinputvalue--querybuilder)
-      - [`sort(value: string, order: 'asc' | 'desc') => QueryBuilder`](#sortvalue-string-order-asc--desc--querybuilder)
-      - [`include(value: string) => QueryBuilder`](#includevalue-string--querybuilder)
-      - [`url(config: qs.IStringifyOptions & UrlConfig) => string`](#urlconfig-qsistringifyoptions--urlconfig--string)
-      - [destroy](#destroy)
-      - [has](#has)
-      - [remove](#remove)
-      - [removeFilter](#removefilter)
-    - [QueryFunction](#queryfunction)
-    - [MutationFunction](#mutationfunction)
+    - [useQueryBuilder](#usequerybuilder)
+      - [Populate](#populate)
+      - [Manipulate](#manipulate)
+      - [Types](#types)
+    - [useQueryFunction](#usequeryfunction)
+    - [useMutationFunction](#usemutationfunction)
   - [Higher-order components](#higher-order-components)
     - [withLoading](#withloading)
     - [withRoleGuard](#withroleguard)
@@ -40,54 +35,74 @@
 
 ## Hooks
 
-### QueryBuilder
+### useQueryBuilder
 
-Creates a query string based on an object which you can populate and manipulate by using any of the following methods:
+This hook is created from the utility class `QueryBuilder` which creates and manages the state of the query. Create a string by calling the `url` method at the end of each statement. Since you can chain different type of methods, a statement ends at the end of the chain.
 
-#### `where(key: string, value: WhereInputValue) => QueryBuilder`
+#### Populate
 
-Pushes a new key-value pair to the `filter` object and returns the current `QueryBuilder` instance.
+| method    | signature                                               | chainable | repeated keys | description                                                                                          |
+| --------- | ------------------------------------------------------- | --------- | ------------- | ---------------------------------------------------------------------------------------------------- |
+| `where`   | `(key: string, value: WhereInputValue) => QueryBuilder` | Yes       | Yes           | Pushes a new key-value pair to the `filter` object and returns the current `QueryBuilder` instance.  |
+| `sort`    | `(key: string, order: 'asc' | 'desc') => QueryBuilder`  | Yes       | No            | Pushes a new key-value pair to the `sort` object and returns the current `QueryBuilder` instance.    |
+| `include` | `(key: string) => QueryBuilder`                         | Yes       | No            | Pushes a new key-value pair to the `include` object and returns the current `QueryBuilder` instance. |
+| `url`     | `(config: qs.IStringifyOptions & UrlConfig) => string`  | No        | -             | Creates a query string. If you do NOT call this method, you will NOT get a query string at all!      |
 
-- Can be used multiple times in a row
-- Can use same values over and over, it will add to the string multiple times like this: `?a=1&a=1&a=1`
+#### Manipulate
 
-#### `sort(value: string, order: 'asc' | 'desc') => QueryBuilder`
+| method         | signature                                 | chainable | description                                                                                                                 |
+| -------------- | ----------------------------------------- | --------- | --------------------------------------------------------------------------------------------------------------------------- |
+| `destroy`      | `(filterType?: keyof ParamsType) => void` | No        | Destroys a subset of the container object based on the given key. If you do NOT provide a key, this will clear every entry! |
+| `remove`       | `(config: RemoveConfig) => QueryBuilder`  | Yes       | Removes a value of an entry and returns the current `QueryBuilder` instance.                                                |
+| `removeFilter` | `(key: string) => QueryBuilder`           | Yes       | Removes an entry of the `filter` object based on the key and returns the current `QueryBuilder` instance.                   |
+| `has`          | `(config: HasConfig) => boolean`          | No        | Checks wheter or not the container object contains a given key or value                                                     |
 
-Pushes a new key-value pair to the `sort` object and returns the current `QueryBuilder` instance.
+#### Types
 
-- Cannot repeat keys!
+**WhereInputValue**
 
-#### `include(value: string) => QueryBuilder`
+Possible values are `'string' | 'number' | 'boolean' | 'null'`
 
-Pushes a new key-value pair to the `include` object and returns the current `QueryBuilder` instance.
+**ParamsType**
 
-- Cannot repeat keys!
+| property  | type           | required | description                                                                                               |
+| --------- | -------------- | -------- | --------------------------------------------------------------------------------------------------------- |
+| `filter`  | `object`       | No       | query conditions, key-value pairs where keys are the column names and values are type of `WhereInputType` |
+| `sort`    | `string array` | No       | keys of the columns to be sorted by                                                                       |
+| `include` | `string array` | No       | names of the models to be included                                                                        |
 
-#### `url(config: qs.IStringifyOptions & UrlConfig) => string`
+**UrlConfig**
 
-Transforms the container object to a string. This method is essential for the query!
-Return the query string with a leading `?`.
+| property            | type      | default | required | description                                                                                              |
+| ------------------- | --------- | ------- | -------- | -------------------------------------------------------------------------------------------------------- |
+| `shouldUpdateState` | `boolean` | `true`  | No       | determines if the query state should update (useful for evading duplicate updaates in `useEffect` hooks) |
 
-**NOTE**: If you do NOT call this method, you will NOT get a query string at all!
+**HasConfig**
 
-#### destroy
+| property | type                                    | default | description                                                                                            |
+| -------- | --------------------------------------- | ------- | ------------------------------------------------------------------------------------------------------ |
+| `type`   | `'key' | 'filter' | 'sort' | 'include'` | -       | key in the container object (`'key'` is a special type that searches in the `filter` object for a key) |
+| `value`  | `string | WhereInputType`               | -       | value to find                                                                                          |
+| `key`    | `string`                                | -       | key in the `filter` object (only accessible if `type` set to `filter`)                                 |
 
-#### has
+**RemoveConfig**
 
-#### remove
+| property | type                            | default | description                                                            |
+| -------- | ------------------------------- | ------- | ---------------------------------------------------------------------- |
+| `type`   | `'filter' | 'sort' | 'include'` | -       | key in the container object                                            |
+| `value`  | `string`                        | -       | value to remove                                                        |
+| `key`    | `string`                        | -       | key in the `filter` object (only accessible if `type` set to `filter`) |
 
-#### removeFilter
-
-### QueryFunction
+### useQueryFunction
 
 Creates a query function for the `react-query` package. Takes two arguments, `config` and `callback`.
 
-| Argument   | Required | Description                                                                                                              |
+| argument   | required | description                                                                                                              |
 | ---------- | -------- | ------------------------------------------------------------------------------------------------------------------------ |
-| `config`   | Yes      | Uses generic type created from `AxiosRequestConfig` to tell `react-query` what type of data to expect from the function. |
-| `callback` | No       | Consumes the context of the `useQuery` hook and returns a new `config`                                                   |
+| `config`   | Yes      | uses generic type created from `AxiosRequestConfig` to tell `react-query` what type of data to expect from the function. |
+| `callback` | No       | consumes the context of the `useQuery` hook and returns a new `config`                                                   |
 
-### MutationFunction
+### useMutationFunction
 
 ## Higher-order components
 

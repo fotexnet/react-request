@@ -34,8 +34,8 @@ export default class QueryBuilder {
    * @param value
    * @returns the current `QueryBuilder` instance
    */
-  public sort(value: string, order: 'asc' | 'desc'): this {
-    const newValue = order === 'asc' ? value : `-${value}`;
+  public sort(key: string, order: 'asc' | 'desc'): this {
+    const newValue = order === 'asc' ? key : `-${key}`;
     this._params = { ...this._params, sort: [...(this._params.sort || []), newValue] };
     return this;
   }
@@ -46,8 +46,8 @@ export default class QueryBuilder {
    * @param value
    * @returns the current `QueryBuilder` instance
    */
-  public include(value: string): this {
-    this._params = { ...this._params, include: [...(this._params.include || []), value] };
+  public include(key: string): this {
+    this._params = { ...this._params, include: [...(this._params.include || []), key] };
     return this;
   }
 
@@ -102,9 +102,11 @@ export default class QueryBuilder {
   public has(config: HasConfig): boolean {
     switch (config.type) {
       case 'filter':
-        return this._hasFilter(config.key, config.value);
+        return this._hasFilter('filter', config.value);
+      case 'key':
+        return this._hasValue('filter', config.value);
       default:
-        return this._hasValue(config.type === 'key' ? 'filter' : config.type, config.value);
+        return this._hasValue(config.type, config.value);
     }
   }
 
