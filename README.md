@@ -82,7 +82,7 @@ Possible values are `'string', 'number', 'boolean', 'null'`
 | property | type                                 | default | description                                                                                            |
 | -------- | ------------------------------------ | ------- | ------------------------------------------------------------------------------------------------------ |
 | `type`   | `'key', 'filter', 'sort', 'include'` | -       | key in the container object (`'key'` is a special type that searches in the `filter` object for a key) |
-| `value`  | `string | WhereInputType`            | -       | value to find                                                                                          |
+| `value`  | `string, WhereInputType`             | -       | value to find                                                                                          |
 | `key`    | `string`                             | -       | key in the `filter` object (only accessible if `type` set to `filter`)                                 |
 
 **RemoveConfig**
@@ -116,5 +116,9 @@ Creates a mutation function for `react-query` package. Returns an object contain
 ## Higher-order components
 
 ### withLoading
+
+Creates a new component which takes an `isLoading` property in addition to it's existing properties. The new component will load the loading indicator if the `isLoading` property is set to `true`. You can customize this indicator through the `spinnerProps` argument (check out the [Spinner](#spinner) component for more information).
+
+**Signature**: `(Component: React.ComponentType<TProps>, spinnerProps?: SpinnerProps) => React.FC<Partial<TProps> & WithLoadingProps>`
 
 ### withRoleGuard
