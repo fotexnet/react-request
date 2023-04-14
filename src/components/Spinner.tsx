@@ -1,4 +1,5 @@
 import React from 'react';
+import { DEFAULT_COLOR } from '../constants';
 import styles from '../styles/Spinner.module.css';
 
 export type SpinnerProps = {
@@ -7,7 +8,7 @@ export type SpinnerProps = {
   width?: number;
 };
 
-function Spinner({ color = 'steelblue', width = 300, stripeWidth = 15 }: SpinnerProps): JSX.Element {
+function Spinner({ color = DEFAULT_COLOR, width = 300, stripeWidth = 15 }: SpinnerProps): JSX.Element {
   return (
     <div className={styles.spinner__container} style={{ width, height: width }}>
       <div
