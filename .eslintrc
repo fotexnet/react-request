@@ -23,6 +23,10 @@
     {
       "files": ["**/__tests__/**/*.[jt]s?(x)", "**/?(*.)+(spec|test).[jt]s?(x)"],
       "extends": ["plugin:testing-library/react"]
+    },
+    {
+      "files": ["**/stories/**/*.stories.mdx", "**/stories/**/*.stories.@(js|jsx|ts|tsx)"],
+      "extends": ["plugin:storybook/recommended"]
     }
   ],
   "rules": {
