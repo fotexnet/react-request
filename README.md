@@ -1,3 +1,6 @@
+# Table of content
+
+- [Table of content](#table-of-content)
 - [Prerequisites](#prerequisites)
 - [Installation](#installation)
 - [Package contents](#package-contents)
@@ -114,6 +117,17 @@ Creates a query function for the `react-query` package. Takes two arguments, `co
 
 **UseQueryFunctionConfig**: `Omit<AxiosRequestConfig<TData>, 'signal'>`
 
+```tsx
+function Component(props: { id?: string }) {
+  const fn = useQueryFunction<ResponseType, { id?: string }>({ baseURL: 'your_api_url' }, context => ({
+    url: context.id,
+  }));
+  const query = useQuery(['your_query_key', { id: props?.id }], fn);
+}
+
+// ResponseType is YOUR api response data structure
+```
+
 ### useMutationFunction
 
 Creates a mutation function for `react-query` package. Returns an object containing two functions: `mutation` and `invalidate`.
@@ -123,12 +137,41 @@ Creates a mutation function for `react-query` package. Returns an object contain
 | `method`  | `'POST', 'PUT', 'DELETE'`                                       | Yes      | mutation method                                      |
 | `factory` | `(variables: TVariables) => Omit<AxiosRequestConfig, 'method'>` | Yes      | consumes the variables to create a mutation function |
 
+```tsx
+function Component(props: { id?: string }) {
+  const request = useMutationFunction<ResponseType, { payload: any }>('POST', variables => ({
+    url: 'your_api_url',
+    data: variables.payload,
+  }));
+  const mutation = useMutation({ mutationFn: request.mutation, onSuccess: () => request.invalidate('your_query_key') });
+}
+
+// ResponseType is YOUR api response data structure
+```
+
 ## Higher-order components
 
 ### withLoading
 
 Creates a new component which takes an `isLoading` property in addition to it's existing properties. The new component will load the loading indicator if the `isLoading` property is set to `true`. You can customize this indicator through the `spinnerProps` argument (check out the [Spinner](#spinner) component for more information).
 
-**Signature**: `(Component: React.ComponentType<TProps>, spinnerProps?: SpinnerProps) => React.FC<Partial<TProps> & WithLoadingProps>`
+```tsx
+withLoading(YourComponent, { color: '#bb703c', strokeWidth: 25 });
+```
+
+Or you can add your own loading indicator:
+
+```tsx
+withLoading(YourComponent, { CustomLoadingIndicator: <YourLoadingIndicator /> });
+```
+
+Then you can call your `NewComponent` like this:
+
+```tsx
+function Page() {
+  // other stuff here..
+  return <NewComponent isLoading={true} />;
+}
+```
 
 ### withRoleGuard
