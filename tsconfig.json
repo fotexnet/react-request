@@ -1,6 +1,5 @@
 {
-  "include": ["src", "types"],
-  "exclude": ["release.config.js"],
+  "include": ["src"],
   "compilerOptions": {
     "baseUrl": ".",
     "target": "esnext",

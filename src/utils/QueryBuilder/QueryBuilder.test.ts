@@ -17,6 +17,7 @@ describe('QueryBuilder class', () => {
     expect(query.startsWith('?')).toBeTruthy();
     expect(matches).toBe(2);
   });
+
   it('should check if query has given value', () => {
     const qb = new QueryBuilder();
     qb.where('name', 'John')
@@ -32,6 +33,7 @@ describe('QueryBuilder class', () => {
     expect(qb.has({ type: 'sort', value: 'updated_at' })).toBeFalsy();
     expect(qb.has({ type: 'include', value: 'user' })).toBeFalsy();
   });
+
   it('should destroy query params', () => {
     const qb = new QueryBuilder();
 
@@ -64,6 +66,7 @@ describe('QueryBuilder class', () => {
     expect(finalQuery.startsWith('?')).toBeTruthy();
     expect(finalMatches).toBe(0);
   });
+
   it('should destroy a single query param', () => {
     const qb = new QueryBuilder();
 
@@ -88,6 +91,7 @@ describe('QueryBuilder class', () => {
     expect(newQuery.startsWith('?')).toBeTruthy();
     expect(newMatches).toBe(0);
   });
+
   it("should remove a key from 'filter'", () => {
     const qb = new QueryBuilder();
 
@@ -108,6 +112,7 @@ describe('QueryBuilder class', () => {
     expect(newQuery.startsWith('?')).toBeTruthy();
     expect(newMatches).toBe(0);
   });
+
   it('should remove a value from a query param', () => {
     const qb = new QueryBuilder();
 
