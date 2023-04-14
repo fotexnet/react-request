@@ -102,7 +102,7 @@ export default class QueryBuilder {
   public has(config: HasConfig): boolean {
     switch (config.type) {
       case 'filter':
-        return this._hasFilter('filter', config.value);
+        return this._hasFilter(config.key, config.value);
       case 'key':
         return this._hasValue('filter', config.value);
       default:
