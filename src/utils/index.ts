@@ -8,3 +8,9 @@ export {
   WhereInputType,
   ParamsType,
 } from './QueryBuilder/QueryBuilder';
+export {
+  default as createHttpClient,
+  HttpClientConfig,
+  HttpClientObject,
+  RequestInterceptor,
+} from './HttpClient/createHttpClient';
