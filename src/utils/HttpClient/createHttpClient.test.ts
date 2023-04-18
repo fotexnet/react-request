@@ -45,4 +45,37 @@ describe('createHttpClient', () => {
     expect(incomingRequestInterceptors).toBeDefined();
     expect(incomingRequestInterceptors?.length).toEqual(3);
   });
+
+  it("should save 'userId' from response using an interceptor", done => {
+    type Todo = { userId: number; id: number; title: string; completed: boolean };
+    let todo: Partial<Todo> = {};
+    const { client } = createHttpClient<Todo>({
+      incomingRequestInterceptors: [
+        {
+          onFulfilled: response => {
+            todo = response.data;
+            return { ...response };
+          },
+        },
+      ],
+    });
+    client
+      .get<Todo>('https://jsonplaceholder.typicode.com/todos/1')
+      .then(res => expect(res.data.userId).toEqual(1))
+      .finally(() => {
+        expect(todo.userId).toEqual(1);
+        done();
+      });
+  });
+
+  it('should attach query param to a request using an interceptor', done => {
+    type Comment = { postId: number; id: number; name: string; email: string; body: string };
+    const { client } = createHttpClient({
+      outgoingRequestInterceptors: [{ onFulfilled: response => ({ ...response, params: { postId: 1 } }) }],
+    });
+    client
+      .get<Comment[]>('https://jsonplaceholder.typicode.com/comments')
+      .then(res => expect(res.data.at(-1)?.id).toEqual(5))
+      .finally(() => done());
+  });
 });

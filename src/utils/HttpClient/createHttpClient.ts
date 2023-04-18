@@ -6,7 +6,9 @@ import axios, {
   InternalAxiosRequestConfig,
 } from 'axios';
 
-export default function createHttpClient(config?: HttpClientConfig): HttpClientObject {
+export default function createHttpClient<TResponseData = unknown, TRequestData = TResponseData>(
+  config?: HttpClientConfig<TResponseData, TRequestData>
+): HttpClientObject {
   const client = axios.create(config?.initialConfig);
 
   const outgoingRequestInterceptors = config?.outgoingRequestInterceptors?.map(({ onFulfilled, onRejected, options }) =>
@@ -26,7 +28,7 @@ export type HttpClientObject = {
   client: AxiosInstance;
 };
 
-export type HttpClientConfig<TOutgoingRequestData = unknown, TIncomingRequestData = unknown> = {
+export type HttpClientConfig<TIncomingRequestData = unknown, TOutgoingRequestData = TIncomingRequestData> = {
   initialConfig?: CreateAxiosDefaults<TOutgoingRequestData>;
   outgoingRequestInterceptors?: RequestInterceptor<InternalAxiosRequestConfig<TOutgoingRequestData>>[];
   incomingRequestInterceptors?: RequestInterceptor<AxiosResponse<TIncomingRequestData>>[];
