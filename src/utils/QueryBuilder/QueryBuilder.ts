@@ -3,15 +3,17 @@ import { Dispatch, SetStateAction } from 'react';
 
 export default class QueryBuilder {
   protected _params: ParamsType;
+  protected _custom: Record<string, unknown[]>;
   protected _dispatch: Dispatch<SetStateAction<string>> | undefined;
 
   constructor(config?: QueryBuilderConfig) {
     this._params = { ...(config?.params || {}) };
+    this._custom = {};
     this._dispatch = config?.dispatch;
   }
 
   get params(): Readonly<ParamsType> {
-    return Object.freeze({ ...this._params });
+    return Object.freeze({ ...this._params, ...this._custom });
   }
 
   /**
@@ -20,7 +22,7 @@ export default class QueryBuilder {
    * @param value
    * @returns the current `QueryBuilder` instance
    */
-  public where(key: string, value: WhereInputType): this {
+  public where(key: string, value: QueryValue): this {
     const filtersObj = this._params.filter || {};
     const context = filtersObj[key] || [];
     const filter = { [key]: [...context, value] };
@@ -52,46 +54,55 @@ export default class QueryBuilder {
   }
 
   /**
+   * Pushes a new key-value pair to the `params` object
+   * @param key
+   * @param value
+   * @returns the current `QueryBuilder` instance
+   */
+  public custom(key: string, value: QueryValue): this {
+    if (!this._custom[key]) this._custom[key] = [value];
+    else this._custom[key].push(value);
+    return this;
+  }
+
+  /**
    * Transforms the `params` object to a string. This method is essential for the query!
    * @param config `qs` library configuration object merged with the `UrlConfig` type
    * @returns the query string with a leading '?'
    */
-  public url({ shouldUpdateState = true, ...config }: qs.IStringifyOptions & UrlConfig = {}): string {
-    const { filter, sort, include } = this._params;
-    const queryParams = [
-      qs.stringify({ filter }, { arrayFormat: 'comma', ...config }),
-      qs.stringify({ sort }, { arrayFormat: 'comma', ...config }),
-      qs.stringify({ include }, { arrayFormat: 'comma', ...config }),
-    ];
+  public url({
+    shouldPrefix = true,
+    shouldUpdateState = true,
+    ...config
+  }: qs.IStringifyOptions & UrlConfig = {}): string {
+    let query: string = qs.stringify({ ...this._params, ...this._custom }, { arrayFormat: 'comma', ...config });
 
-    const query = queryParams.reduce((prev, curr) => {
-      // if both prev and curr are falsy, then return prev ('') and continue
-      if (!prev && !curr) return prev;
-      // if prev is falsy, then it must be the first iteration, so return curr and continue
-      if (!prev) return '?' + curr;
-      // if curr is falsy, then return prev and continue
-      if (!curr) return prev;
-      // if prev and curr is truthy, then concatenate prev + curr
-      return prev + '&' + curr;
-    }, '');
-
+    if (shouldPrefix) query = '?' + query;
     if (this._dispatch && shouldUpdateState) this._dispatch(query);
+
     return query;
   }
 
   /**
    * Destroys a subset of the `params` object based on the given key. If you do NOT provide a key, this will clear every entry!
-   * @param filterType a key of the `params` object
+   * @param key a key of the `params` object
    */
-  public destroy(filterType?: keyof ParamsType): void {
-    if (!filterType) {
+  public destroy(key?: string): void {
+    if (!key) {
       this._params = {};
+      this._custom = {};
       return;
     }
-    this._params = (Object.getOwnPropertyNames(this._params) as (keyof ParamsType)[]).reduce((prev, curr) => {
-      if (curr === filterType) return prev;
-      return { ...prev, [curr]: this._params[curr] };
-    }, {});
+
+    const filterByKey = (obj: Record<string, unknown>) => {
+      return Object.getOwnPropertyNames(obj).reduce((prev, curr) => {
+        if (curr === key) return prev;
+        return { ...prev, [curr]: obj[curr] };
+      }, {});
+    };
+
+    this._params = filterByKey(this._params);
+    this._custom = filterByKey(this._custom);
   }
 
   /**
@@ -100,69 +111,68 @@ export default class QueryBuilder {
    * @returns `true` or `false`
    */
   public has(config: HasConfig): boolean {
-    switch (config.type) {
-      case 'filter':
-        return this._hasFilter(config.key, config.value);
-      case 'key':
-        return this._hasValue('filter', config.value);
-      default:
-        return this._hasValue(config.type, config.value);
+    if (config.use === 'param') {
+      return this._hasParam(config.config);
     }
+
+    return this._hasCustomParam(config.config);
   }
 
   /**
-   * Removes a subset of the `params` object
+   * Removes a subset of the values on the `params` object
    * @param config
    * @returns the current `QueryBuilder` instance
    */
   public remove(config: RemoveConfig): this {
-    switch (config.type) {
-      case 'filter':
-        if (!this._params.filter) return this;
-        this._params.filter[config.key] = this._params.filter[config.key].filter(x => x !== config.value);
-        return this;
-      case 'sort':
-      case 'include':
-        if (!this._params[config.type]) return this;
-        this._params[config.type] = this._params[config.type]?.filter(x => x !== config.value) || [];
-        return this;
-      default:
-        return this;
+    if (config.use === 'param') {
+      return this._removeParam(config.config);
     }
+
+    return this._removeCustomParam(config.config);
   }
 
-  /**
-   * Removes a subset of the `params` object based on the key
-   * @param key
-   * @returns the current `QueryBuilder` instance
-   */
-  public removeFilter(key: string): this {
-    if (!this._params.filter || !this._params.filter[key]) return this;
+  protected _hasCustomParam(config: HasCustomConfig): boolean {
+    if (config.for === 'key') return Object.getOwnPropertyNames(this._custom).includes(config.value);
 
-    const keys = Object.getOwnPropertyNames(this._params.filter);
-    const filteredKeys = keys.filter(x => x !== key);
+    for (const key in this._custom) {
+      if (this._custom[key].includes(config.value)) return true;
+    }
 
-    const filters = filteredKeys.reduce((prev, curr) => {
-      if (!this._params.filter) return prev;
-      return { ...prev, [curr]: [...this._params.filter[curr]] };
-    }, {});
+    return false;
+  }
 
-    this._params = { ...this._params, filter: { ...filters } };
+  protected _hasParam(config: HasParamConfig): boolean {
+    if (config.type === 'filter') {
+      if (!this._params.filter) return false;
+      if (config.for === 'key') return Object.getOwnPropertyNames(this._params.filter).includes(config.value);
+
+      for (const key in this._params.filter) {
+        if (this._params.filter[key].includes(config.value)) return true;
+      }
+    }
+
+    const array = this._params[config.type];
+    if (!array) return false;
+
+    return Array.isArray(array) && typeof config.value === 'string' && array.includes(config.value);
+  }
+
+  protected _removeCustomParam(config: RemoveCustomConfig): this {
+    if (Object.getOwnPropertyNames(this._custom).includes(config.key)) {
+      this._custom[config.key] = this._custom[config.key].filter(value => value !== config.value);
+      if (this._custom[config.key].length === 0) delete this._custom[config.key];
+    }
+
     return this;
   }
 
-  protected _hasValue(filterType: keyof ParamsType, value: string): boolean {
-    if (!this._params[filterType]) return false;
-    const params =
-      filterType === 'filter'
-        ? Object.getOwnPropertyNames(this._params[filterType])
-        : (this._params[filterType] as string[]);
-    return params.includes(value);
-  }
+  protected _removeParam(config: RemoveParamConfig): this {
+    if (config.type === 'filter' && !!this._params.filter) {
+      this._params.filter[config.key] = this._params.filter[config.key].filter(value => value !== config.value);
+      if (this._params.filter[config.key].length === 0) delete this._params.filter[config.key];
+    }
 
-  protected _hasFilter(key: string, value: WhereInputType): boolean {
-    if (!this._params.filter || !this._params.filter[key]) return false;
-    return this._params.filter[key].includes(value);
+    return this;
   }
 }
 
@@ -172,35 +182,26 @@ export type QueryBuilderConfig = {
 };
 
 export type ParamsType = {
-  filter?: Record<string, WhereInputType[]>;
+  filter?: Record<string, QueryValue[]>;
   sort?: string[];
   include?: string[];
 };
 
-export type WhereInputType = string | number | boolean | null;
+export type QueryValue = string | number | boolean | null;
 
-export type HasConfig =
-  | {
-      type: 'key' | 'sort' | 'include';
-      value: string;
-    }
-  | {
-      type: 'filter';
-      key: string;
-      value: WhereInputType;
-    };
+export type HasConfig = { use: 'param'; config: HasParamConfig } | { use: 'custom'; config: HasCustomConfig };
+export type HasCustomConfig = { for: 'key'; value: string } | { for: 'value'; value: QueryValue };
+export type HasParamConfig =
+  | ({ type: 'filter' } & ({ for: 'key'; value: string } | { for: 'value'; value: QueryValue }))
+  | { type: 'include' | 'sort'; value: string };
 
-export type RemoveConfig =
-  | {
-      type: 'sort' | 'include';
-      value: string;
-    }
-  | {
-      type: 'filter';
-      key: string;
-      value: string;
-    };
+export type RemoveConfig = { use: 'param'; config: RemoveParamConfig } | { use: 'custom'; config: RemoveCustomConfig };
+export type RemoveCustomConfig = { key: string; value: QueryValue };
+export type RemoveParamConfig =
+  | { type: 'filter'; key: string; value: QueryValue }
+  | { type: 'include' | 'sort'; value: string };
 
 export type UrlConfig = {
+  shouldPrefix?: boolean;
   shouldUpdateState?: boolean;
 };

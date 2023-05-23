@@ -54,25 +54,25 @@ This hook is created from the utility class `QueryBuilder` which creates and man
 
 #### Populate
 
-| method    | signature                                               | chainable | repeated keys | description                                                                                          |
-| --------- | ------------------------------------------------------- | --------- | ------------- | ---------------------------------------------------------------------------------------------------- |
-| `where`   | `(key: string, value: WhereInputValue) => QueryBuilder` | Yes       | Yes           | Pushes a new key-value pair to the `filter` object and returns the current `QueryBuilder` instance.  |
-| `sort`    | `(key: string, order: 'asc', 'desc') => QueryBuilder`   | Yes       | No            | Pushes a new key-value pair to the `sort` object and returns the current `QueryBuilder` instance.    |
-| `include` | `(key: string) => QueryBuilder`                         | Yes       | No            | Pushes a new key-value pair to the `include` object and returns the current `QueryBuilder` instance. |
-| `url`     | `(config: qs.IStringifyOptions & UrlConfig) => string`  | No        | -             | Creates a query string. If you do NOT call this method, you will NOT get a query string at all!      |
+| method    | signature                                              | chainable | repeated keys | description                                                                                          |
+| --------- | ------------------------------------------------------ | --------- | ------------- | ---------------------------------------------------------------------------------------------------- |
+| `where`   | `(key: string, value: QueryValue) => QueryBuilder`     | Yes       | Yes           | Pushes a new key-value pair to the `filter` object and returns the current `QueryBuilder` instance.  |
+| `sort`    | `(key: string, order: 'asc', 'desc') => QueryBuilder`  | Yes       | No            | Pushes a new key-value pair to the `sort` object and returns the current `QueryBuilder` instance.    |
+| `include` | `(key: string) => QueryBuilder`                        | Yes       | No            | Pushes a new key-value pair to the `include` object and returns the current `QueryBuilder` instance. |
+| `custom`  | `(key: string, value: QueryValue) => QueryBuilder`     | Yes       | Yes           | Pushes a new key-value pair to the `params` object and returns the current `QueryBuilder` instance.  |
+| `url`     | `(config: qs.IStringifyOptions & UrlConfig) => string` | No        | -             | Creates a query string. If you do NOT call this method, you will NOT get a query string at all!      |
 
 #### Manipulate
 
-| method         | signature                                 | chainable | description                                                                                                                 |
-| -------------- | ----------------------------------------- | --------- | --------------------------------------------------------------------------------------------------------------------------- |
-| `destroy`      | `(filterType?: keyof ParamsType) => void` | No        | Destroys a subset of the container object based on the given key. If you do NOT provide a key, this will clear every entry! |
-| `remove`       | `(config: RemoveConfig) => QueryBuilder`  | Yes       | Removes a value of an entry and returns the current `QueryBuilder` instance.                                                |
-| `removeFilter` | `(key: string) => QueryBuilder`           | Yes       | Removes an entry of the `filter` object based on the key and returns the current `QueryBuilder` instance.                   |
-| `has`          | `(config: HasConfig) => boolean`          | No        | Checks wheter or not the container object contains a given key or value                                                     |
+| method    | signature                                 | chainable | description                                                                                                                 |
+| --------- | ----------------------------------------- | --------- | --------------------------------------------------------------------------------------------------------------------------- |
+| `destroy` | `(filterType?: keyof ParamsType) => void` | No        | Destroys a subset of the container object based on the given key. If you do NOT provide a key, this will clear every entry! |
+| `remove`  | `(config: RemoveConfig) => QueryBuilder`  | Yes       | Removes a value of an entry and returns the current `QueryBuilder` instance.                                                |
+| `has`     | `(config: HasConfig) => boolean`          | No        | Checks wheter or not the container object contains a given key or value                                                     |
 
 #### Types
 
-**WhereInputValue**
+**QueryValue**
 
 Possible values are `'string', 'number', 'boolean', 'null'`
 
@@ -86,25 +86,54 @@ Possible values are `'string', 'number', 'boolean', 'null'`
 
 **UrlConfig**
 
-| property            | type      | default | required | description                                                                                              |
-| ------------------- | --------- | ------- | -------- | -------------------------------------------------------------------------------------------------------- |
-| `shouldUpdateState` | `boolean` | `true`  | No       | determines if the query state should update (useful for evading duplicate updaates in `useEffect` hooks) |
+| property            | type      | default | required | description                                                                                             |
+| ------------------- | --------- | ------- | -------- | ------------------------------------------------------------------------------------------------------- |
+| `shouldPrefix`      | `boolean` | `true`  | No       | determines if the query state should be prefixed with `?`                                               |
+| `shouldUpdateState` | `boolean` | `true`  | No       | determines if the query state should update (useful for evading duplicate updates in `useEffect` hooks) |
 
 **HasConfig**
 
-| property | type                                 | default | description                                                                                            |
-| -------- | ------------------------------------ | ------- | ------------------------------------------------------------------------------------------------------ |
-| `type`   | `'key', 'filter', 'sort', 'include'` | -       | key in the container object (`'key'` is a special type that searches in the `filter` object for a key) |
-| `value`  | `string, WhereInputType`             | -       | value to find                                                                                          |
-| `key`    | `string`                             | -       | key in the `filter` object (only accessible if `type` set to `filter`)                                 |
+| property | type                                 | default | description                                                                             |
+| -------- | ------------------------------------ | ------- | --------------------------------------------------------------------------------------- |
+| `use`    | `param`, `custom`                    | -       | `params` is for `filter`, `include` and `sort`. `custom` is for a custom key-value pair |
+| `config` | `HasParamConfig` , `HasCustomConfig` | -       | -                                                                                       |
+
+**HasParamConfig**
+
+| property | type                        | default | description                                                                   |
+| -------- | --------------------------- | ------- | ----------------------------------------------------------------------------- |
+| `type`   | `filter`, `include`, `sort` | -       | key in `params` object                                                        |
+| `for`    | `key` , `value`             | -       | specify which value you want to modify (only available if `type` is `filter`) |
+| `value`  | `string` , `QueryValue`     | -       | value for the search                                                          |
+
+**HasCustomConfig**
+
+| property | type                    | default | description                                                                                |
+| -------- | ----------------------- | ------- | ------------------------------------------------------------------------------------------ |
+| `for`    | `key` , `value`         | -       | specify which value you want to modify (can be anything excep `filter`, `include`, `sort`) |
+| `value`  | `string` , `QueryValue` | -       | value for the search                                                                       |
 
 **RemoveConfig**
 
-| property | type                          | default | description                                                            |
-| -------- | ----------------------------- | ------- | ---------------------------------------------------------------------- |
-| `type`   | `'filter', 'sort', 'include'` | -       | key in the container object                                            |
-| `value`  | `string`                      | -       | value to remove                                                        |
-| `key`    | `string`                      | -       | key in the `filter` object (only accessible if `type` set to `filter`) |
+| property | type                                       | default | description                                                                             |
+| -------- | ------------------------------------------ | ------- | --------------------------------------------------------------------------------------- |
+| `use`    | `param`, `custom`                          | -       | `params` is for `filter`, `include` and `sort`. `custom` is for a custom key-value pair |
+| `config` | `RemoveParamConfig` , `RemoveCustomConfig` | -       | -                                                                                       |
+
+**RemoveParamConfig**
+
+| property | type                        | default | description                                                                |
+| -------- | --------------------------- | ------- | -------------------------------------------------------------------------- |
+| `type`   | `filter`, `include`, `sort` | -       | key in `params` object                                                     |
+| `key`    | `string`                    | -       | key of the value you want to remove (only available if `type` is `filter`) |
+| `value`  | `string` , `QueryValue`     | -       | value to remove                                                            |
+
+**RemoveCustomConfig**
+
+| property | type         | default | description                                                                             |
+| -------- | ------------ | ------- | --------------------------------------------------------------------------------------- |
+| `key`    | `string`     | -       | key of the value you want to remove (can be anything excep `filter`, `include`, `sort`) |
+| `value`  | `QueryValue` | -       | value to remove                                                                         |
 
 ### useQueryFunction
 
