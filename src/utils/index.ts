@@ -5,7 +5,7 @@ export {
   HasConfig,
   RemoveConfig,
   UrlConfig,
-  WhereInputType,
+  QueryValue as WhereInputType,
   ParamsType,
 } from './QueryBuilder/QueryBuilder';
 export {

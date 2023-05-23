@@ -24,14 +24,14 @@ describe('QueryBuilder class', () => {
       .where('name', 'Doe')
       .sort('created_at', 'desc');
 
-    expect(qb.has({ type: 'key', value: 'name' })).toBeTruthy();
-    expect(qb.has({ type: 'key', value: 'age' })).toBeFalsy();
-    expect(qb.has({ type: 'filter', key: 'name', value: 'John' })).toBeTruthy();
-    expect(qb.has({ type: 'filter', key: 'name', value: 'Doe' })).toBeTruthy();
-    expect(qb.has({ type: 'filter', key: 'name', value: 'Jane' })).toBeFalsy();
-    expect(qb.has({ type: 'sort', value: '-created_at' })).toBeTruthy();
-    expect(qb.has({ type: 'sort', value: 'updated_at' })).toBeFalsy();
-    expect(qb.has({ type: 'include', value: 'user' })).toBeFalsy();
+    expect(qb.has({ use: 'param', config: { type: 'filter', for: 'key', value: 'name' } })).toBeTruthy();
+    expect(qb.has({ use: 'param', config: { type: 'filter', for: 'key', value: 'age' } })).toBeFalsy();
+    expect(qb.has({ use: 'param', config: { type: 'filter', for: 'value', value: 'John' } })).toBeTruthy();
+    expect(qb.has({ use: 'param', config: { type: 'filter', for: 'value', value: 'Doe' } })).toBeTruthy();
+    expect(qb.has({ use: 'param', config: { type: 'filter', for: 'value', value: 'Jane' } })).toBeFalsy();
+    expect(qb.has({ use: 'param', config: { type: 'sort', value: '-created_at' } })).toBeTruthy();
+    expect(qb.has({ use: 'param', config: { type: 'sort', value: 'updated_at' } })).toBeFalsy();
+    expect(qb.has({ use: 'param', config: { type: 'include', value: 'user' } })).toBeFalsy();
   });
 
   it('should destroy query params', () => {
@@ -105,7 +105,9 @@ describe('QueryBuilder class', () => {
     expect(query.startsWith('?')).toBeTruthy();
     expect(matches).toBe(1);
 
-    const newQuery = qb.removeFilter('name').url({ encode: false });
+    const newQuery = qb
+      .remove({ use: 'param', config: { type: 'filter', key: 'name', value: 'John' } })
+      .url({ encode: false });
     const newMatches = numberOfMatches(newQuery, '&');
     expect(newQuery).not.toContain('filter[name]=John');
     expect(newQuery).toContain('filter[age]=25');
@@ -129,7 +131,9 @@ describe('QueryBuilder class', () => {
     expect(query.startsWith('?')).toBeTruthy();
     expect(matches).toBe(2);
 
-    const newQuery = qb.remove({ type: 'filter', key: 'name', value: 'John' }).url({ encode: false });
+    const newQuery = qb
+      .remove({ use: 'param', config: { type: 'filter', key: 'name', value: 'John' } })
+      .url({ encode: false });
     const newMatches = numberOfMatches(newQuery, '&');
     expect(newQuery).not.toContain('John');
     expect(newQuery).toContain('filter[name]=Doe');
@@ -137,6 +141,50 @@ describe('QueryBuilder class', () => {
     expect(newQuery).toContain('sort=age');
     expect(newQuery.startsWith('?')).toBeTruthy();
     expect(newMatches).toBe(2);
+  });
+
+  it('should create custom filters', () => {
+    const qb = new QueryBuilder();
+
+    const query = qb
+      .custom('page', 2)
+      .custom('per_page', 10)
+      .custom('enabled', true)
+      .custom('enabled', false)
+      .url({ encode: false });
+    const matches = numberOfMatches(query, '&');
+    expect(query).toContain('page=2');
+    expect(query).toContain('per_page=10');
+    expect(query.startsWith('?')).toBeTruthy();
+    expect(matches).toBe(2);
+    expect(qb.params).toMatchObject({ enabled: [true, false] });
+  });
+
+  it('should remove custom filters', () => {
+    const qb = new QueryBuilder();
+
+    const query = qb
+      .custom('page', 2)
+      .custom('per_page', 10)
+      .custom('enabled', true)
+      .custom('enabled', false)
+      .url({ encode: false });
+    const matches = numberOfMatches(query, '&');
+    expect(query).toContain('page=2');
+    expect(query).toContain('per_page=10');
+    expect(query.startsWith('?')).toBeTruthy();
+    expect(matches).toBe(2);
+    expect(qb.params).toMatchObject({ enabled: [true, false] });
+
+    const newQuery = qb
+      .remove({ use: 'custom', config: { key: 'enabled', value: false } })
+      .remove({ use: 'custom', config: { key: 'page', value: 2 } })
+      .url({ encode: false });
+    const newMatches = numberOfMatches(newQuery, '&');
+    expect(newQuery).toContain('enabled=true');
+    expect(newQuery).not.toContain('page=2');
+    expect(newQuery.startsWith('?')).toBeTruthy();
+    expect(newMatches).toBe(1);
   });
 });
 

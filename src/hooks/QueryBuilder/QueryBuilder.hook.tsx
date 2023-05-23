@@ -13,13 +13,13 @@ function useQueryBuilder(): UseQueryBuilder {
     query,
     params: qb.params,
     url: qb.url.bind(qb),
+    where: qb.where.bind(qb),
     include: qb.include.bind(qb),
     sort: qb.sort.bind(qb),
-    where: qb.where.bind(qb),
-    destroy: qb.destroy.bind(qb),
-    remove: qb.remove.bind(qb),
-    removeFilter: qb.removeFilter.bind(qb),
+    custom: qb.custom.bind(qb),
     has: qb.has.bind(qb),
+    remove: qb.remove.bind(qb),
+    destroy: qb.destroy.bind(qb),
   };
 }
 
