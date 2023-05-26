@@ -1,4 +1,4 @@
-import axios, { AxiosRequestConfig, AxiosResponse, Method } from 'axios';
+import axios, { AxiosInstance, AxiosRequestConfig, AxiosResponse, Method } from 'axios';
 import { useQueryClient } from 'react-query';
 
 /**
@@ -9,11 +9,15 @@ import { useQueryClient } from 'react-query';
  */
 function useMutationFunction<TResponse, TVariables = unknown>(
   method: Extract<Method, 'POST' | 'PUT' | 'DELETE'>,
-  factory: (variables: TVariables) => Omit<AxiosRequestConfig, 'method'>
+  factory: (variables: TVariables) => Omit<AxiosRequestConfig, 'method'> & { httpClient?: AxiosInstance }
 ): UseMutationFunctionResult<TResponse, TVariables> {
   const queryClient = useQueryClient();
   return {
-    mutation: (variables: TVariables) => axios.request({ method, ...factory(variables) }),
+    mutation: (variables: TVariables) => {
+      const { httpClient, ...config } = factory(variables);
+      const client = httpClient || axios;
+      return client.request({ method, ...config });
+    },
     invalidate: (key: string) => queryClient.invalidateQueries(key),
   };
 }
