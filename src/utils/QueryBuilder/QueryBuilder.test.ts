@@ -97,19 +97,18 @@ describe('QueryBuilder class', () => {
 
     const query = qb
       .where('name', 'John')
+      .where('name', 'Doe')
       .where('age', 25)
       .url({ encode: false });
     const matches = numberOfMatches(query, '&');
-    expect(query).toContain('filter[name]=John');
+    expect(query).toContain('filter[name]=John,Doe');
     expect(query).toContain('filter[age]=25');
     expect(query.startsWith('?')).toBeTruthy();
     expect(matches).toBe(1);
 
-    const newQuery = qb
-      .remove({ use: 'param', config: { type: 'filter', key: 'name', value: 'John' } })
-      .url({ encode: false });
+    const newQuery = qb.remove({ use: 'param', config: { type: 'filter', key: 'name' } }).url({ encode: false });
     const newMatches = numberOfMatches(newQuery, '&');
-    expect(newQuery).not.toContain('filter[name]=John');
+    expect(newQuery).not.toContain('filter[name]=John,Doe');
     expect(newQuery).toContain('filter[age]=25');
     expect(newQuery.startsWith('?')).toBeTruthy();
     expect(newMatches).toBe(0);

@@ -168,8 +168,21 @@ export default class QueryBuilder {
 
   protected _removeParam(config: RemoveParamConfig): this {
     if (config.type === 'filter' && !!this._params.filter) {
-      this._params.filter[config.key] = this._params.filter[config.key].filter(value => value !== config.value);
-      if (this._params.filter[config.key].length === 0) delete this._params.filter[config.key];
+      if (config.value !== undefined) {
+        this._params.filter[config.key] = this._params.filter[config.key].filter(value => value !== config.value);
+      }
+      if (config.value === undefined || this._params.filter[config.key].length === 0) {
+        delete this._params.filter[config.key];
+      }
+    }
+
+    if (config.type !== 'filter') {
+      if (!!this._params[config.type]) {
+        this._params[config.type] = this._params[config.type]?.filter(value => value !== config.value);
+      }
+      if (this._params[config.type]?.length === 0) {
+        delete this._params[config.type];
+      }
     }
 
     return this;
@@ -198,7 +211,7 @@ export type HasParamConfig =
 export type RemoveConfig = { use: 'param'; config: RemoveParamConfig } | { use: 'custom'; config: RemoveCustomConfig };
 export type RemoveCustomConfig = { key: string; value: QueryValue };
 export type RemoveParamConfig =
-  | { type: 'filter'; key: string; value: QueryValue }
+  | { type: 'filter'; key: string; value?: QueryValue }
   | { type: 'include' | 'sort'; value: string };
 
 export type UrlConfig = {
