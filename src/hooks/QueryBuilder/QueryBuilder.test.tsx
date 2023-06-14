@@ -1,5 +1,5 @@
 describe('useQueryBuilder', () => {
-  it('should mount', () => {
+  it('should return params object', () => {
     expect(true).toBeTruthy();
   });
 });
