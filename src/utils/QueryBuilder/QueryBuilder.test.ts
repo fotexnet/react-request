@@ -185,6 +185,27 @@ describe('QueryBuilder class', () => {
     expect(newQuery.startsWith('?')).toBeTruthy();
     expect(newMatches).toBe(1);
   });
+
+  it('should add the same filters after removing them', () => {
+    const qb = new QueryBuilder();
+    const query = qb
+      .where('date', '2023-03-03')
+      .where('film_id', '7')
+      .where('active', true)
+      .remove({ use: 'param', config: { type: 'filter', key: 'date' } })
+      .remove({ use: 'param', config: { type: 'filter', key: 'film_id' } })
+      .remove({ use: 'param', config: { type: 'filter', key: 'active' } })
+      .where('date', '2023-03-03')
+      .where('film_id', '7')
+      .where('active', true)
+      .url({ encode: false });
+    const matches = numberOfMatches(query, '&');
+    expect(query).toContain('filter[date]=2023-03-03');
+    expect(query).toContain('filter[film_id]=7');
+    expect(query).toContain('filter[active]=true');
+    expect(query.startsWith('?')).toBeTruthy();
+    expect(matches).toBe(2);
+  });
 });
 
 function numberOfMatches(str: string, value: string): number {

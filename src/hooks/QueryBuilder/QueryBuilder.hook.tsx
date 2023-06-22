@@ -9,6 +9,7 @@ function useQueryBuilder(): UseQueryBuilder {
   const [query, setQuery] = useState<string>('');
   const qb = useMemo(() => new QueryBuilder({ dispatch: setQuery }), []);
 
+  // TODO: write test for qb.params
   return {
     query,
     params: qb.params,
