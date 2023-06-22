@@ -7,6 +7,7 @@ function PageLoader(props: SpinnerProps): JSX.Element {
   return (
     <ScrollLock>
       <div className={styles.container}>
+        <div className={styles.backdrop}></div>
         <Spinner {...props} />
       </div>
     </ScrollLock>
