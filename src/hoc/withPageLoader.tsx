@@ -1,7 +1,7 @@
 import React from 'react';
 import { WithLoadingProps } from './withLoading';
 import { SpinnerProps } from 'src/components';
-import PageLoaderComponent from 'src/components/PageLoader';
+import PageLoader from 'src/components/PageLoader';
 
 function withPageLoader<TProps extends object>(
   Component: React.ComponentType<TProps>,
@@ -11,7 +11,7 @@ function withPageLoader<TProps extends object>(
   return function WithRoleGuardComponent({ isLoading, ...props }) {
     return (
       <>
-        {isLoading && <PageLoaderComponent {...spinnerProps} />}
+        {isLoading && <PageLoader {...spinnerProps} />}
         <Component {...(props as TProps)} />
       </>
     );

@@ -3,7 +3,7 @@ import ScrollLock from 'react-scrolllock';
 import styles from '../styles/PageLoader.module.css';
 import Spinner, { SpinnerProps } from './Spinner';
 
-function PageLoaderComponent(props: SpinnerProps): JSX.Element {
+function PageLoader(props: SpinnerProps): JSX.Element {
   return (
     <ScrollLock>
       <div className={styles.container}>
@@ -13,4 +13,4 @@ function PageLoaderComponent(props: SpinnerProps): JSX.Element {
   );
 }
 
-export default PageLoaderComponent;
+export default PageLoader;

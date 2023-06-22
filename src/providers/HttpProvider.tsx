@@ -1,16 +1,16 @@
 import { AxiosInstance } from 'axios';
-import React, { createContext, useContext } from 'react';
+import React, { PropsWithChildren, createContext, useContext } from 'react';
 
 const HttpContext = createContext<AxiosInstance | null>(null);
 
-const HttpProvider: React.FC<React.PropsWithChildren<{ client: AxiosInstance }>> = ({ client, children }) => {
+function HttpProvider({ client, children }: PropsWithChildren<{ client: AxiosInstance }>): JSX.Element {
   return <HttpContext.Provider value={client}>{children}</HttpContext.Provider>;
-};
+}
 
 export default HttpProvider;
 
-export const useHttpClient = (): AxiosInstance => {
+export function useHttpClient(): AxiosInstance {
   const context = useContext(HttpContext);
   if (context === null) throw new Error('No client provided!');
   return context;
-};
+}
