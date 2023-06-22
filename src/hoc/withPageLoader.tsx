@@ -1,7 +1,7 @@
 import React from 'react';
+import PageLoader from '../components/PageLoader';
+import { SpinnerProps } from '../components/Spinner';
 import { WithLoadingProps } from './withLoading';
-import { SpinnerProps } from 'src/components';
-import PageLoader from 'src/components/PageLoader';
 
 function withPageLoader<TProps extends object>(
   Component: React.ComponentType<TProps>,
