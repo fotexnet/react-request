@@ -13,7 +13,7 @@ export default config;
 const PageLoaderStory: StoryFn<SpinnerProps> = args => (
   <>
     <Component {...args} />
-    <div style={{ width: '100%', height: '100vh', background: 'rgba(249, 113, 133, 1)' }}></div>
+    <div style={{ width: '100%', height: '200vh', background: 'rgba(249, 113, 133, 1)' }}></div>
   </>
 );
 
