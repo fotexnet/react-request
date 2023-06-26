@@ -5,6 +5,11 @@ export type WithLoadingProps = {
   isLoading: boolean;
 };
 
+export type WithLoadingConfig = { containerProps?: React.ComponentPropsWithoutRef<'div'> } & (
+  | SpinnerProps
+  | CustomLoadingIndicator
+);
+
 function withLoading<TProps extends object>(
   Component: React.ComponentType<TProps>,
   config?: WithLoadingConfig
@@ -33,8 +38,4 @@ function isCustomLoadingIndicator(argument: unknown): argument is CustomLoadingI
   return typeof argument === 'object' && Object.getOwnPropertyNames(argument).includes('CustomSpinner');
 }
 
-type WithLoadingConfig = { containerProps?: React.ComponentPropsWithoutRef<'div'> } & (
-  | SpinnerProps
-  | CustomLoadingIndicator
-);
 type CustomLoadingIndicator = { CustomLoadingIndicator: JSX.Element };
