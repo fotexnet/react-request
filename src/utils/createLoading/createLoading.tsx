@@ -1,11 +1,10 @@
-import { SpinnerProps } from '../../components/Spinner';
-import withLoading, { WithLoadingProps } from '../../hoc/withLoading';
+import withLoading, { WithLoadingConfig, WithLoadingProps } from '../../hoc/withLoading';
 
-function createLoading(spinnerProps: SpinnerProps) {
+function createLoading(config: WithLoadingConfig) {
   return <T extends object | Record<string, unknown>>(
     Component: React.ComponentType<T>
   ): React.FC<Partial<T> & WithLoadingProps> => {
-    return withLoading(Component, spinnerProps);
+    return withLoading(Component, config);
   };
 }
 
