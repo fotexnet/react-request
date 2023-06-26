@@ -3,8 +3,10 @@ import { SpinnerProps } from '../../components/Spinner';
 import { WithLoadingProps } from '../../hoc/withLoading';
 import withPageLoader from '../../hoc/withPageLoader';
 
-function createPageLoader<T extends object>(config: SpinnerProps) {
-  return (Component: React.ComponentType<T>): React.FC<Partial<T> & WithLoadingProps> => {
+function createPageLoader(config: SpinnerProps) {
+  return <T extends object | Record<string, unknown>>(
+    Component: React.ComponentType<T>
+  ): React.FC<Partial<T> & WithLoadingProps> => {
     return withPageLoader(Component, config);
   };
 }
