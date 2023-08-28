@@ -3,7 +3,9 @@ import ScrollLock from 'react-scrolllock';
 import styles from '../styles/PageLoader.module.css';
 import Spinner, { SpinnerProps } from './Spinner';
 
-function PageLoader(props: SpinnerProps): JSX.Element {
+export type PageLoaderProps = SpinnerProps & { backdropColor?: string };
+
+function PageLoader({ backdropColor, ...props }: PageLoaderProps): JSX.Element {
   const [lockPosition, setLockPosition] = useState<number>(0);
 
   useEffect(() => {
@@ -13,7 +15,7 @@ function PageLoader(props: SpinnerProps): JSX.Element {
   return (
     <ScrollLock>
       <div className={styles.container} style={{ top: lockPosition }}>
-        <div className={styles.backdrop}></div>
+        <div className={styles.backdrop} style={{ backgroundColor: backdropColor }}></div>
         <Spinner {...props} />
       </div>
     </ScrollLock>
