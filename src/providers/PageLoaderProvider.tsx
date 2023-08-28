@@ -1,6 +1,5 @@
 import React, { PropsWithChildren, createContext, useContext, useState } from 'react';
-import PageLoader from '../components/PageLoader';
-import { SpinnerProps } from '../components/Spinner';
+import PageLoader, { PageLoaderProps as LoaderProps } from '../components/PageLoader';
 
 type PageLoaderProps = {
   setPageLoading: (value: boolean) => void;
@@ -8,7 +7,7 @@ type PageLoaderProps = {
 
 const PageLoaderContext = createContext<PageLoaderProps | null>(null);
 
-function PageLoaderProvider({ children, ...props }: PropsWithChildren<SpinnerProps>): JSX.Element {
+function PageLoaderProvider({ children, ...props }: PropsWithChildren<LoaderProps>): JSX.Element {
   const [isLoading, setIsLoading] = useState<boolean>(false);
 
   return (
