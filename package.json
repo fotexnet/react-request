@@ -16,8 +16,7 @@
   },
   "publishConfig": {},
   "engines": {
-    "node": ">=10",
-    "npm": "use Yarn!"
+    "node": ">=10"
   },
   "scripts": {
     "start": "tsdx watch",
